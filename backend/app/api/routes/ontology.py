@@ -85,6 +85,7 @@ def generate_project_ontology(
         domain_profile=domain_profile,
         max_candidates=payload.max_candidates,
         min_term_length=payload.min_term_length,
+        db=db,
     )
 
 

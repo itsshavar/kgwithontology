@@ -32,6 +32,7 @@ textarea {
 
 button {
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .app-shell {
@@ -120,6 +121,12 @@ pre {
   color: var(--text);
   border-radius: 999px;
   padding: 10px 16px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.tab:hover {
+  background: var(--panel-soft);
 }
 
 .tab.active,
@@ -129,10 +136,20 @@ pre {
   border: 0;
 }
 
+.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(90, 169, 255, 0.3);
+}
+
 .ghost {
   background: transparent;
   color: var(--text);
   border: 1px solid var(--line);
+  transition: all 0.2s ease;
+}
+
+.ghost:hover {
+  background: var(--panel-soft);
 }
 
 .small {

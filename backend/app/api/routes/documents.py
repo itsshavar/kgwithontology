@@ -9,6 +9,7 @@ from app.schemas.document import DocumentRead
 from app.schemas.extraction import DocumentUploadResponse, KGExtractionRunResponse
 from app.services.extraction.document_kg_extractor import extract_kg_from_documents
 from app.services.ingestion.document_service import save_upload
+from app.services.ontology.generator import auto_generate_ontology
 
 router = APIRouter(prefix="/projects/{project_id}/documents", tags=["documents"])
 
@@ -30,11 +31,21 @@ async def upload_document(
     db.refresh(document)
 
     extraction_summary: KGExtractionRunResponse | None = None
+    ontology_summary: OntologyGenerateResponse | None = None
     if auto_extract and (document.raw_text or "").strip():
         extraction_result = extract_kg_from_documents(project=project, documents=[document], db=db)
         extraction_summary = KGExtractionRunResponse(**extraction_result)
 
-    return DocumentUploadResponse(document=DocumentRead.model_validate(document), extraction=extraction_summary)
+        # Auto-generate ontology
+        domain_profile = db.get(DomainProfile, project.domain_profile_id) if project.domain_profile_id else None
+        ontology_summary = auto_generate_ontology(
+            project=project,
+            documents=[document],
+            domain_profile=domain_profile,
+            db=db,
+        )
+
+    return DocumentUploadResponse(document=DocumentRead.model_validate(document), extraction=extraction_summary, ontology=ontology_summary)
 
 
 @router.get("", response_model=list[DocumentRead])

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 
 from app.schemas.document import DocumentRead
+from app.schemas.ontology import OntologyGenerateResponse
 
 
 class KGExtractionRunResponse(BaseModel):
@@ -18,3 +19,4 @@ class KGExtractionRunResponse(BaseModel):
 class DocumentUploadResponse(BaseModel):
     document: DocumentRead
     extraction: KGExtractionRunResponse | None = None
+    ontology: OntologyGenerateResponse | None = None

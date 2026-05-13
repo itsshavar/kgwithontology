@@ -1003,9 +1003,13 @@ els.uploadDocumentForm.addEventListener("submit", async (event) => {
     });
     els.uploadDocumentForm.reset();
     state.lastExtractionSummary = result.extraction || null;
-    const message = result.extraction
-      ? `Uploaded '${result.document.filename}' and extracted ${result.extraction.created_relations} relations.`
-      : `Uploaded document '${result.document.filename}'.`;
+    const extractionMsg = result.extraction
+      ? ` and extracted ${result.extraction.created_relations} relations`
+      : "";
+    const ontologyMsg = result.ontology
+      ? ` and generated ${result.ontology.candidates.length} class candidates`
+      : "";
+    const message = `Uploaded '${result.document.filename}'${extractionMsg}${ontologyMsg}.`;
     setStatus(message, "success");
     await loadProjectData(projectId, false);
   } catch (error) {

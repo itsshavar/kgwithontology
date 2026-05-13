@@ -13,8 +13,16 @@ class OntologyCandidate(BaseModel):
     evidence: str | None = None
 
 
+class OntologyPropertyCandidate(BaseModel):
+    term: str
+    frequency: int
+    suggested_type: str = "PropertyCandidate"
+    evidence: str | None = None
+
+
 class OntologyGenerateResponse(BaseModel):
     project_id: int
     total_documents: int
     total_chunks: int
     candidates: list[OntologyCandidate]
+    property_candidates: list[OntologyPropertyCandidate]
