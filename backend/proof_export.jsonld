@@ -1,0 +1,260 @@
+[
+  {
+    "@id": "https://ontoforge.local/project/1/entity/1-alice",
+    "@type": [
+      "https://ontoforge.local/project/1/schema/class/3-researcher"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Alice"
+      }
+    ],
+    "https://ontoforge.local/meta/source": [
+      {
+        "@value": "auto-extracted"
+      }
+    ],
+    "https://ontoforge.local/project/1/schema/property/1-works-for": [
+      {
+        "@id": "https://ontoforge.local/project/1/entity/2-acme-labs"
+      }
+    ],
+    "https://ontoforge.local/project/1/schema/property/3-email": [
+      {
+        "@value": "alice@example"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/schema/class/2-organization",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Organization"
+      }
+    ],
+    "https://ontoforge.local/meta/source": [
+      {
+        "@value": "rdf-import"
+      }
+    ],
+    "https://ontoforge.local/meta/status": [
+      {
+        "@value": "imported"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/schema/property/2-memberof",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "https://ontoforge.local/project/1/schema/class/1-person"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "memberOf"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "https://ontoforge.local/project/1/schema/class/2-organization"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/schema/property/3-email",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#DatatypeProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@value": "Auto-created from extraction phrase 'email'."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "https://ontoforge.local/project/1/schema/class/3-researcher"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Email"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/schema/property/1-works-for",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#ObjectProperty"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@value": "Updated property description"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "https://ontoforge.local/project/1/schema/class/1-person"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Works For"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/ontology",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Ontology"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@value": "Proof run"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Proof Project"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/relation/1",
+    "@type": [
+      "https://ontoforge.local/meta/RelationInstance"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@value": "Alice works for Acme Labs."
+      }
+    ],
+    "https://ontoforge.local/meta/object": [
+      {
+        "@id": "https://ontoforge.local/project/1/entity/2-acme-labs"
+      }
+    ],
+    "https://ontoforge.local/meta/predicate": [
+      {
+        "@id": "https://ontoforge.local/project/1/schema/property/1-works-for"
+      }
+    ],
+    "https://ontoforge.local/meta/sourceDocumentId": [
+      {
+        "@value": 1
+      }
+    ],
+    "https://ontoforge.local/meta/subject": [
+      {
+        "@id": "https://ontoforge.local/project/1/entity/1-alice"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/schema/class/3-researcher",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Researcher"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "https://ontoforge.local/project/1/schema/class/1-person"
+      }
+    ],
+    "https://ontoforge.local/meta/source": [
+      {
+        "@value": "rdf-import"
+      }
+    ],
+    "https://ontoforge.local/meta/status": [
+      {
+        "@value": "imported"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/entity/2-acme-labs",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Acme Labs"
+      }
+    ],
+    "https://ontoforge.local/meta/source": [
+      {
+        "@value": "auto-extracted"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/schema/class/1-person",
+    "@type": [
+      "http://www.w3.org/2002/07/owl#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@value": "Updated human class description"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Person"
+      }
+    ],
+    "https://ontoforge.local/meta/source": [
+      {
+        "@value": "rdf-import"
+      }
+    ],
+    "https://ontoforge.local/meta/status": [
+      {
+        "@value": "imported"
+      }
+    ]
+  },
+  {
+    "@id": "https://ontoforge.local/project/1/relation/2",
+    "@type": [
+      "https://ontoforge.local/meta/RelationInstance"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@value": "Updated evidence text"
+      }
+    ],
+    "https://ontoforge.local/meta/objectLiteral": [
+      {
+        "@value": "alice@example"
+      }
+    ],
+    "https://ontoforge.local/meta/predicate": [
+      {
+        "@id": "https://ontoforge.local/project/1/schema/property/3-email"
+      }
+    ],
+    "https://ontoforge.local/meta/sourceDocumentId": [
+      {
+        "@value": 1
+      }
+    ],
+    "https://ontoforge.local/meta/subject": [
+      {
+        "@id": "https://ontoforge.local/project/1/entity/1-alice"
+      }
+    ]
+  }
+]

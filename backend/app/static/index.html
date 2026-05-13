@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OntoForge Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">OF</div>
+          <div>
+            <h1>OntoForge Studio</h1>
+            <p>Upload documents, import ontology, auto-extract KG facts, build schema, edit relations, and export semantic outputs.</p>
+          </div>
+        </div>
+
+        <section class="panel">
+          <h2>Create Project</h2>
+          <form id="createProjectForm" class="stack-form">
+            <label>
+              <span>Project name</span>
+              <input id="projectName" name="name" type="text" placeholder="Acme Knowledge Graph" required />
+            </label>
+            <label>
+              <span>Description</span>
+              <textarea id="projectDescription" name="description" rows="3" placeholder="What domain or corpus is this for?"></textarea>
+            </label>
+            <button type="submit" class="primary">Create project</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Current Project</h2>
+            <button id="refreshProjectsBtn" type="button" class="ghost small">Refresh</button>
+          </div>
+          <label>
+            <span>Select project</span>
+            <select id="projectSelect"></select>
+          </label>
+          <div id="projectMeta" class="meta-card empty-state small-empty">Create or select a project to begin.</div>
+          <div class="button-row wrap">
+            <button id="reloadWorkspaceBtn" type="button" class="ghost">Reload workspace data</button>
+            <button id="syncGraphBtn" type="button" class="ghost">Sync to Neo4j</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Export</h2>
+          <div class="button-row wrap">
+            <button id="exportRdfBtn" type="button" class="ghost">Export RDF/XML</button>
+            <button id="exportOwlBtn" type="button" class="ghost">Export OWL</button>
+            <button id="exportJsonldBtn" type="button" class="ghost">Export JSON-LD</button>
+            <button id="exportTurtleBtn" type="button" class="ghost">Export Turtle</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>System Status</h2>
+            <span id="graphHealthBadge" class="pill neutral">Checking graph…</span>
+          </div>
+          <div id="statusMessage" class="status-message">Ready.</div>
+        </section>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <h2>Ontology + Knowledge Graph Workspace</h2>
+            <p>Use the tabs below to upload data, import ontology files, auto-extract entities and relations, edit ontology structure, inspect evidence, and export semantic outputs.</p>
+          </div>
+        </header>
+
+        <nav class="tabs" aria-label="Workspace views">
+          <button class="tab active" data-tab="ingest">Ingestion</button>
+          <button class="tab" data-tab="ontology">Ontology Builder</button>
+          <button class="tab" data-tab="kg">Knowledge Graph</button>
+        </nav>
+
+        <section id="tab-ingest" class="tab-panel active">
+          <div class="grid two-up">
+            <article class="panel">
+              <div class="panel-head">
+                <h3>Upload Document</h3>
+                <span class="pill neutral">Auto KG extraction on upload</span>
+              </div>
+              <form id="uploadDocumentForm" class="stack-form">
+                <label>
+                  <span>Document file</span>
+                  <input id="documentFile" name="file" type="file" required />
+                </label>
+                <button type="submit" class="primary">Upload document</button>
+              </form>
+              <p class="helper-text">PDF, DOCX, TXT, Markdown, JSON, RDF/Turtle-family documents, and text-like files are supported. Upload triggers hybrid extraction automatically.</p>
+            </article>
+
+            <article class="panel">
+              <h3>Upload Existing Ontology</h3>
+              <form id="uploadOntologyForm" class="stack-form">
+                <label>
+                  <span>Ontology file</span>
+                  <input id="ontologyFile" name="file" type="file" accept=".json,.ttl,.rdf,.owl,.xml,.nt,.n3,.jsonld,application/json,application/rdf+xml,text/turtle,application/owl+xml,application/ld+json" required />
+                </label>
+                <button type="submit" class="primary">Import ontology</button>
+              </form>
+              <details class="hint-box">
+                <summary>Supported import formats</summary>
+                <div class="helper-text spaced">JSON app format, OWL/RDF XML, Turtle, N-Triples, N3, and JSON-LD.</div>
+                <pre>{
+  "classes": [
+    {"name": "Person", "description": "An individual actor"},
+    {"name": "Organization"},
+    {"name": "Researcher", "parent": "Person"}
+  ],
+  "properties": [
+    {"name": "works_for", "property_type": "object", "domain": "Person", "range": "Organization"},
+    {"name": "email", "property_type": "data", "domain": "Person", "range_datatype": "string"}
+  ]
+}</pre>
+              </details>
+            </article>
+          </div>
+
+          <div class="grid two-up">
+            <article class="panel">
+              <div class="panel-head">
+                <h3>Ontology Suggestions & Extraction</h3>
+                <div class="button-row wrap compact">
+                  <button id="generateCandidatesBtn" type="button" class="ghost">Generate suggestions</button>
+                  <button id="runExtractionBtn" type="button" class="ghost">Extract KG from all docs</button>
+                </div>
+              </div>
+              <div class="inline-controls">
+                <label>
+                  <span>Max candidates</span>
+                  <input id="candidateLimit" type="number" min="1" max="100" value="12" />
+                </label>
+                <label>
+                  <span>Min term length</span>
+                  <input id="candidateTermLength" type="number" min="2" max="30" value="4" />
+                </label>
+              </div>
+              <div id="extractionSummary" class="meta-card small-empty">No extraction run yet.</div>
+              <div id="candidateResults" class="card-list empty-state">Upload documents and generate suggestions to see candidate ontology terms.</div>
+            </article>
+
+            <article class="panel">
+              <h3>Uploaded Documents</h3>
+              <div id="documentsTable" class="table-wrapper empty-state">No documents uploaded yet.</div>
+            </article>
+          </div>
+        </section>
+
+        <section id="tab-ontology" class="tab-panel">
+          <div class="grid two-up">
+            <article class="panel">
+              <div class="panel-head">
+                <h3 id="classFormTitle">Add Ontology Class</h3>
+                <button id="classCancelBtn" type="button" class="ghost small hidden">Cancel edit</button>
+              </div>
+              <form id="createClassForm" class="stack-form">
+                <label>
+                  <span>Name</span>
+                  <input id="className" type="text" required placeholder="Concept" />
+                </label>
+                <label>
+                  <span>Label</span>
+                  <input id="classLabel" type="text" placeholder="Human-friendly label" />
+                </label>
+                <label>
+                  <span>Description</span>
+                  <textarea id="classDescription" rows="3" placeholder="What does this class represent?"></textarea>
+                </label>
+                <label>
+                  <span>Parent class</span>
+                  <select id="classParentSelect"></select>
+                </label>
+                <button id="classSubmitBtn" type="submit" class="primary">Add class</button>
+              </form>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <h3 id="propertyFormTitle">Add Ontology Property</h3>
+                <button id="propertyCancelBtn" type="button" class="ghost small hidden">Cancel edit</button>
+              </div>
+              <form id="createPropertyForm" class="stack-form">
+                <label>
+                  <span>Name</span>
+                  <input id="propertyName" type="text" required placeholder="related_to" />
+                </label>
+                <label>
+                  <span>Label</span>
+                  <input id="propertyLabel" type="text" placeholder="Related to" />
+                </label>
+                <label>
+                  <span>Description</span>
+                  <textarea id="propertyDescription" rows="3" placeholder="What relationship or attribute does this represent?"></textarea>
+                </label>
+                <div class="inline-controls">
+                  <label>
+                    <span>Type</span>
+                    <select id="propertyType">
+                      <option value="object">Object property</option>
+                      <option value="data">Data property</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Datatype</span>
+                    <input id="propertyDatatype" type="text" placeholder="string, integer, date" />
+                  </label>
+                </div>
+                <div class="inline-controls">
+                  <label>
+                    <span>Domain class</span>
+                    <select id="propertyDomainSelect"></select>
+                  </label>
+                  <label>
+                    <span>Range class</span>
+                    <select id="propertyRangeSelect"></select>
+                  </label>
+                </div>
+                <button id="propertySubmitBtn" type="submit" class="primary">Add property</button>
+              </form>
+            </article>
+          </div>
+
+          <div class="grid two-up">
+            <article class="panel">
+              <h3>Ontology Tree</h3>
+              <div id="ontologyTree" class="tree-panel empty-state">No ontology classes yet.</div>
+            </article>
+
+            <article class="panel">
+              <h3>Classes</h3>
+              <div id="classesTable" class="table-wrapper empty-state">No ontology classes yet.</div>
+            </article>
+          </div>
+
+          <div class="panel">
+            <h3>Properties</h3>
+            <div id="propertiesTable" class="table-wrapper empty-state">No ontology properties yet.</div>
+          </div>
+        </section>
+
+        <section id="tab-kg" class="tab-panel">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Ontology Classes</span>
+              <strong id="classCount">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Ontology Properties</span>
+              <strong id="propertyCount">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Entities</span>
+              <strong id="entityCount">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Relations</span>
+              <strong id="relationCount">0</strong>
+            </div>
+          </div>
+
+          <div class="grid two-up">
+            <article class="panel">
+              <h3>Add Entity</h3>
+              <form id="createEntityForm" class="stack-form">
+                <label>
+                  <span>Canonical name</span>
+                  <input id="entityName" type="text" required placeholder="Alice" />
+                </label>
+                <label>
+                  <span>Ontology class</span>
+                  <select id="entityClassSelect"></select>
+                </label>
+                <label>
+                  <span>Aliases (comma separated)</span>
+                  <input id="entityAliases" type="text" placeholder="A. Smith, Alice Smith" />
+                </label>
+                <button type="submit" class="primary">Add entity</button>
+              </form>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <h3 id="relationFormTitle">Add Relation</h3>
+                <button id="relationCancelBtn" type="button" class="ghost small hidden">Cancel edit</button>
+              </div>
+              <form id="createRelationForm" class="stack-form">
+                <label>
+                  <span>Subject entity</span>
+                  <select id="relationSubjectSelect"></select>
+                </label>
+                <label>
+                  <span>Predicate</span>
+                  <select id="relationPredicateSelect"></select>
+                </label>
+                <label>
+                  <span>Object entity (optional)</span>
+                  <select id="relationObjectSelect"></select>
+                </label>
+                <label>
+                  <span>Literal value (optional)</span>
+                  <input id="relationLiteralValue" type="text" placeholder="Use when relation points to a value" />
+                </label>
+                <label>
+                  <span>Source document (optional)</span>
+                  <select id="relationSourceDocumentSelect"></select>
+                </label>
+                <label>
+                  <span>Evidence text</span>
+                  <textarea id="relationEvidence" rows="3" placeholder="Paste the source sentence or paragraph."></textarea>
+                </label>
+                <button id="relationSubmitBtn" type="submit" class="primary">Add relation</button>
+              </form>
+            </article>
+          </div>
+
+          <div class="panel graph-panel">
+            <div class="panel-head">
+              <h3>Graph View</h3>
+              <span class="legend">Blue: classes · Green: entities · Gold: literals/datatypes</span>
+            </div>
+            <svg id="graphCanvas" viewBox="0 0 1000 560" role="img" aria-label="Knowledge graph visualization"></svg>
+          </div>
+
+          <div class="grid two-up">
+            <article class="panel">
+              <h3>Entities</h3>
+              <div id="entitiesTable" class="table-wrapper empty-state">No entities yet.</div>
+            </article>
+            <article class="panel">
+              <h3>Relations</h3>
+              <div id="relationsTable" class="table-wrapper empty-state">No relations yet.</div>
+            </article>
+          </div>
+
+          <div class="panel">
+            <h3>Evidence Viewer</h3>
+            <div id="evidenceViewer" class="evidence-viewer empty-state">Select a relation evidence item to inspect source text highlighting.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

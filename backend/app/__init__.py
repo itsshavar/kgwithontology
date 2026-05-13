@@ -1,0 +1,1 @@
+"""OntoForge FastAPI application package."""

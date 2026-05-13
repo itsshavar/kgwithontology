@@ -1,0 +1,4 @@
+# Optional ML extras for transformer-assisted extraction.
+# Install after requirements.txt if you want local transformer NER support.
+transformers==4.44.2
+torch==2.4.1
