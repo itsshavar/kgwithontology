@@ -9,6 +9,7 @@ const state = {
   relations: [],
   graph: null,
   candidates: [],
+  propertyCandidates: [],
   lastExtractionSummary: null,
   editingClassId: null,
   editingPropertyId: null,
@@ -43,6 +44,7 @@ const els = {
   candidateTermLength: document.getElementById("candidateTermLength"),
   extractionSummary: document.getElementById("extractionSummary"),
   candidateResults: document.getElementById("candidateResults"),
+  propertyCandidateResults: document.getElementById("propertyCandidateResults"),
   documentsTable: document.getElementById("documentsTable"),
   ontologyTree: document.getElementById("ontologyTree"),
   createClassForm: document.getElementById("createClassForm"),
@@ -294,6 +296,28 @@ function renderCandidates() {
           <p>Frequency: ${candidate.frequency} · Type: ${escapeHtml(candidate.suggested_type)}</p>
           <p>${escapeHtml(candidate.evidence || "No evidence available.")}</p>
           <button type="button" class="ghost small add-candidate-btn" data-term="${escapeHtml(candidate.term)}">Add as class</button>
+        </article>
+      `,
+    )
+    .join("");
+}
+
+function renderPropertyCandidates() {
+  if (!state.propertyCandidates.length) {
+    els.propertyCandidateResults.innerHTML = "Generate suggestions to see candidate ontology properties.";
+    els.propertyCandidateResults.classList.add("empty-state");
+    return;
+  }
+
+  els.propertyCandidateResults.classList.remove("empty-state");
+  els.propertyCandidateResults.innerHTML = state.propertyCandidates
+    .map(
+      (candidate) => `
+        <article class="candidate-card">
+          <strong>${escapeHtml(candidate.term)}</strong>
+          <p>Frequency: ${candidate.frequency} · Type: ${escapeHtml(candidate.suggested_type)}</p>
+          <p>${escapeHtml(candidate.evidence || "No evidence available.")}</p>
+          <button type="button" class="ghost small add-property-candidate-btn" data-term="${escapeHtml(candidate.term)}">Add as property</button>
         </article>
       `,
     )
@@ -1072,11 +1096,15 @@ els.generateCandidatesBtn.addEventListener("click", async () => {
       body: JSON.stringify(payload),
     });
     state.candidates = result.candidates || [];
+    state.propertyCandidates = result.property_candidates || [];
     renderCandidates();
-    setStatus(`Generated ${state.candidates.length} ontology candidates from uploaded documents.`, "success");
+    renderPropertyCandidates();
+    setStatus(`Generated ${state.candidates.length} class and ${state.propertyCandidates.length} property candidates from uploaded documents.`, "success");
   } catch (error) {
     state.candidates = [];
+    state.propertyCandidates = [];
     renderCandidates();
+    renderPropertyCandidates();
     setStatus(`Candidate generation failed: ${error.message}`, "danger");
   }
 });
@@ -1107,6 +1135,38 @@ els.candidateResults.addEventListener("click", async (event) => {
     activateTab("ontology");
   } catch (error) {
     setStatus(`Could not add candidate as class: ${error.message}`, "danger");
+  }
+});
+
+els.propertyCandidateResults.addEventListener("click", async (event) => {
+  const target = event.target.closest(".add-property-candidate-btn");
+  if (!target) return;
+
+  try {
+    const projectId = requireProject();
+    if (!projectId) return;
+    const term = target.dataset.term;
+    await api(`/api/v1/projects/${projectId}/ontology/properties`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: term,
+        label: titleCase(term),
+        description: `Imported from document suggestion: ${term}`,
+        property_type: "object", // assume object, can be changed later
+        domain_class_id: null,
+        range_class_id: null,
+        range_datatype: null,
+        status: "draft",
+        source: "candidate",
+        confidence: null,
+      }),
+    });
+    await loadProjectData(projectId, false);
+    setStatus(`Added '${term}' as ontology property.`, "success");
+    activateTab("ontology");
+  } catch (error) {
+    setStatus(`Could not add candidate as property: ${error.message}`, "danger");
   }
 });
 
