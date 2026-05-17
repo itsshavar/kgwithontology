@@ -3,10 +3,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.models.domain_profile import DomainProfile
 from app.models.project import Project
 from app.models.source_document import SourceDocument
 from app.schemas.document import DocumentRead
 from app.schemas.extraction import DocumentUploadResponse, KGExtractionRunResponse
+from app.schemas.ontology import OntologyGenerateResponse
 from app.services.extraction.document_kg_extractor import extract_kg_from_documents
 from app.services.ingestion.document_service import save_upload
 from app.services.ontology.generator import auto_generate_ontology

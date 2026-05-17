@@ -1,6 +1,3 @@
-from collections.abc import Iterable
-from io import BytesIO
-import json
 import re
 
 from rdflib import Graph, Literal, Namespace, URIRef

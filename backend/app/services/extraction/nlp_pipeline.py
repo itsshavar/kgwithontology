@@ -3,8 +3,6 @@ import os
 import re
 from dataclasses import dataclass, field
 from functools import lru_cache
-from typing import Any
-
 import httpx
 
 ENTITY_PATTERN = r"[A-Z][A-Za-z0-9&._-]*(?:\s+[A-Z][A-Za-z0-9&._-]*){0,3}"

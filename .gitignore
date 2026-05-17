@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Application runtime artifacts
+backend/data/
+backend/proof_export.*
+backend/proof_report.json
