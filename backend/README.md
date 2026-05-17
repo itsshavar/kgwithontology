@@ -224,3 +224,17 @@ The current scaffold was smoke-tested with FastAPI `TestClient` for:
 - Uploaded files are stored under `backend/data/uploads/`.
 - SQLite DB is stored at `backend/data/app.db`.
 - Neo4j sync is implemented as a scaffold and currently uses a reified `RelationInstance` node model.
+
+## Enterprise modules added
+- Auth/RBAC: `/api/v1/auth/register`, `/api/v1/auth/login`, `/api/v1/auth/api-keys`, `/api/v1/users/me`, seeded Admin/Ontology Engineer/Data Analyst/Viewer/API User roles.
+- Auditability: `audit_logs` model and admin audit-list endpoint.
+- Operations: extraction job resource under `/api/v1/projects/{project_id}/jobs/extraction` with inline execution for local mode and Celery/RQ-ready persistence.
+- Search/query: deterministic local search plus Neo4j Cypher execution scaffold at `/api/v1/projects/{project_id}/search` and `/api/v1/projects/{project_id}/query`.
+- Visualization: normalized graph/tree/timeline payload at `/api/v1/projects/{project_id}/visualization`.
+- Versioning metadata: `ontology_versions` and `kg_metadata` tables for ontology/KG version tracking.
+
+## Deployment assets
+- Root `Dockerfile` runs the FastAPI API.
+- Root `docker-compose.yml` starts API, PostgreSQL, Redis, Neo4j, and OpenSearch.
+- `deploy/k8s/api-deployment.yaml` provides starter Kubernetes Deployment/Service manifests.
+- `.github/workflows/ci.yml` installs dependencies, compiles the app, runs tests, and runs Ruff.
