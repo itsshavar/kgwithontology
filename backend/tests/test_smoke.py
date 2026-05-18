@@ -1,8 +1,11 @@
 import os
+from io import BytesIO
 from pathlib import Path
+from zipfile import ZipFile
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["SECRET_KEY"] = "test-secret"
+os.environ["REQUIRE_AUTH"] = "true"
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -26,7 +29,7 @@ def test_auth_project_ingestion_ontology_kg_search_flow(tmp_path: Path):
         assert roles.status_code == 200
         assert {role["name"] for role in roles.json()} >= {"Admin", "Viewer", "Data Analyst"}
 
-        project = client.post("/api/v1/projects", json={"name": "Acme KG", "description": "Test workspace"})
+        project = client.post("/api/v1/projects", json={"name": "Acme KG", "description": "Test workspace"}, headers=headers)
         assert project.status_code == 201, project.text
         project_id = project.json()["id"]
 
@@ -44,6 +47,24 @@ def test_auth_project_ingestion_ontology_kg_search_flow(tmp_path: Path):
         search = client.post(f"/api/v1/projects/{project_id}/search", json={"query": "Alice", "limit": 5})
         assert search.status_code == 200, search.text
         assert search.json()["hits"]
+
+
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, "w") as archive:
+            archive.writestr("structured.csv", "name,relation,target\nAlice,uses,OntoForge")
+        zip_upload = client.post(
+            f"/api/v1/projects/{project_id}/documents/zip?auto_extract=false",
+            files={"file": ("bundle.zip", zip_buffer.getvalue(), "application/zip")},
+        )
+        assert zip_upload.status_code == 201, zip_upload.text
+        assert zip_upload.json()[0]["document"]["filename"] == "structured.csv"
+
+        sparql = client.post(
+            f"/api/v1/projects/{project_id}/query",
+            json={"language": "sparql", "query": "SELECT ?s WHERE { ?s ?p ?o }", "limit": 5},
+        )
+        assert sparql.status_code == 200, sparql.text
+        assert sparql.json()["executed"] is True
 
         viz = client.get(f"/api/v1/projects/{project_id}/visualization")
         assert viz.status_code == 200, viz.text

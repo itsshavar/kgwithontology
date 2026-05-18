@@ -9,6 +9,7 @@ from app.models.project import Project
 from app.models.relation_instance import RelationInstance
 from app.models.source_document import SourceDocument
 from app.schemas.operations import QueryRequest, QueryResponse, SearchHit, SearchRequest, SearchResponse
+from app.services.export_service import build_project_rdf_graph
 from app.services.graph.neo4j_service import neo4j_service
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["search-query"])
@@ -44,7 +45,17 @@ def execute_query(project_id: int, payload: QueryRequest, db: Session = Depends(
             return QueryResponse(language="cypher", executed=True, rows=rows, message="Executed against Neo4j.")
         return QueryResponse(language="cypher", executed=False, rows=[], message="Neo4j is not configured; query saved for external execution.")
     if payload.language == "sparql":
-        return QueryResponse(language="sparql", executed=False, rows=[], message="SPARQL endpoint scaffold is available; configure a triplestore for execution.")
+        graph = build_project_rdf_graph(db.get(Project, project_id), db)
+        result = graph.query(payload.query)
+        rows = []
+        for index, row in enumerate(result):
+            if index >= payload.limit:
+                break
+            row_dict = {}
+            for key, value in row.asdict().items():
+                row_dict[str(key)] = str(value)
+            rows.append(row_dict)
+        return QueryResponse(language="sparql", executed=True, rows=rows, message="Executed against the project RDF graph.")
     relations = db.scalars(select(RelationInstance).where(RelationInstance.project_id == project_id).limit(payload.limit)).all()
     rows = [{"id": relation.id, "predicate_id": relation.predicate_id, "confidence": relation.confidence} for relation in relations]
     return QueryResponse(language=payload.language, executed=True, rows=rows, message="Executed deterministic local project query.")

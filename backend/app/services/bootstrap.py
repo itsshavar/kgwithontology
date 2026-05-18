@@ -5,10 +5,33 @@ from app.models.security import Permission, Role, RolePermission
 
 DEFAULT_ROLES = {
     "Admin": ["*"],
-    "Ontology Engineer": ["ontology:read", "ontology:write", "documents:read", "kg:read"],
-    "Data Analyst": ["documents:read", "documents:write", "kg:read", "kg:write", "query:execute"],
-    "Viewer": ["documents:read", "ontology:read", "kg:read"],
-    "API User": ["api:access", "query:execute"],
+    "Ontology Engineer": [
+        "projects:read",
+        "documents:read",
+        "documents:write",
+        "ontology:read",
+        "ontology:write",
+        "kg:read",
+    ],
+    "Data Analyst": [
+        "projects:read",
+        "documents:read",
+        "documents:write",
+        "kg:read",
+        "kg:write",
+        "query:execute",
+        "visualization:read",
+    ],
+    "Viewer": ["projects:read", "documents:read", "ontology:read", "kg:read", "visualization:read"],
+    "API User": [
+        "api:access",
+        "projects:read",
+        "documents:read",
+        "ontology:read",
+        "kg:read",
+        "query:execute",
+        "visualization:read",
+    ],
 }
 
 
@@ -29,7 +52,12 @@ def bootstrap_rbac(db: Session) -> None:
             db.add(role)
             db.flush()
         for code in codes:
-            exists = db.scalar(select(RolePermission).where(RolePermission.role_id == role.id, RolePermission.permission_id == permissions[code].id))
+            exists = db.scalar(
+                select(RolePermission).where(
+                    RolePermission.role_id == role.id,
+                    RolePermission.permission_id == permissions[code].id,
+                )
+            )
             if not exists:
                 db.add(RolePermission(role_id=role.id, permission_id=permissions[code].id))
     db.commit()

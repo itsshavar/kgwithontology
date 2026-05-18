@@ -43,7 +43,11 @@ def create_extraction_job(project_id: int, payload: ExtractionJobCreate, db: Ses
             job.error = str(exc)
     else:
         db.flush()
-        run_project_extraction_job.delay(job.id)
+        try:
+            run_project_extraction_job.delay(job.id)
+        except Exception as exc:
+            job.status = "failed"
+            job.error = f"Could not enqueue background job: {exc}"
     db.commit()
     db.refresh(job)
     return job

@@ -24,3 +24,13 @@ OntoForge is organized as an API-first FastAPI backend with modular packages for
 - Background extraction job resource, compatible with Celery/RQ workers.
 - Docker Compose and Kubernetes deployment manifests.
 - OpenAPI documentation at `/docs`.
+
+## Completed working workflows
+
+1. Register or log in, create an API key, and optionally set `REQUIRE_AUTH=true` for RBAC-protected APIs.
+2. Create projects and manage project memberships.
+3. Upload one file, many files, ZIP archives, or fetch a remote URL into a project.
+4. Extract text from TXT/Markdown/HTML, CSV, JSON, XML, YAML, PDF, DOCX, XLSX, RTF, and semantic web formats.
+5. Run deterministic KG extraction immediately or queue it through Celery/Redis.
+6. Generate/import/edit ontologies and export RDF/XML, OWL, JSON-LD, and Turtle.
+7. Query the project RDF graph with SPARQL, query Neo4j with Cypher when configured, and retrieve visualization-ready graph/tree/timeline data.
