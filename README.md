@@ -6,6 +6,7 @@ OntoForge is a Python 3.11+ FastAPI platform for document ingestion, ontology cr
 
 - Modular FastAPI backend with versioned REST APIs and Swagger UI.
 - Upload and process single files, bulk uploads, ZIP archives, remote URLs, text, PDF, DOCX, XLSX, CSV/JSON/XML/YAML, markup, and semantic-web formats.
+- Upload and process text, PDF, DOCX, structured, markup, and semantic-web formats.
 - Generate entities, relations, RDF triples, ontology classes, and ontology properties.
 - Import/export TTL, OWL/RDF XML, JSON-LD, N-Triples, N3, and application JSON.
 - Works without LLMs via deterministic rule/NLP pipelines; optional LLM provider hooks are available.
@@ -13,6 +14,7 @@ OntoForge is a Python 3.11+ FastAPI platform for document ingestion, ontology cr
 - Optional Neo4j sync and Cypher query execution.
 - Built-in web UI for ingestion, ontology editing, KG exploration, evidence review, visualization, and export.
 - Docker Compose, Kubernetes manifests, GitHub Actions CI, and pytest smoke coverage for end-to-end workflows.
+- Docker Compose, Kubernetes starter manifests, and GitHub Actions CI.
 
 ## Quick start
 

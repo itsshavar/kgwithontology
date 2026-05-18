@@ -224,6 +224,7 @@ The current application was smoke-tested with FastAPI `TestClient` for:
 - Uploaded files are stored under `backend/data/uploads/`.
 - SQLite DB is stored at `backend/data/app.db`.
 - Neo4j sync is implemented and currently uses a reified `RelationInstance` node model.
+- Neo4j sync is implemented as a scaffold and currently uses a reified `RelationInstance` node model.
 
 ## Enterprise modules added
 - Auth/RBAC: `/api/v1/auth/register`, `/api/v1/auth/login`, `/api/v1/auth/api-keys`, `/api/v1/users/me`, seeded Admin/Ontology Engineer/Data Analyst/Viewer/API User roles.
