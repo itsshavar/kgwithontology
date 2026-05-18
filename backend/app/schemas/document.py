@@ -13,3 +13,9 @@ class DocumentRead(BaseModel):
     chunk_count: int
     status: str
     created_at: datetime
+
+
+class DocumentUrlIngest(BaseModel):
+    url: str
+    filename: str | None = None
+    auto_extract: bool = True

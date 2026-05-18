@@ -313,5 +313,16 @@ class Neo4jService:
         with driver.session(database=settings.neo4j_database) as session:
             session.run(query, payload)
 
+    def execute_read(self, query: str, limit: int = 100) -> list[dict[str, Any]]:
+        if not self.enabled:
+            return []
+        driver = self.get_driver()
+        if driver is None:
+            return []
+        limited_query = query if "limit" in query.lower() else f"{query} LIMIT {int(limit)}"
+        with driver.session(database=settings.neo4j_database) as session:
+            result = session.run(limited_query)
+            return [dict(record) for record in result]
+
 
 neo4j_service = Neo4jService()

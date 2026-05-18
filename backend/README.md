@@ -1,8 +1,8 @@
-# OntoForge Backend Scaffold
+# OntoForge Backend
 
-A working FastAPI scaffold for a domain-aware ontology generator and knowledge graph creator.
+A working FastAPI application for a domain-aware ontology generator and knowledge graph creator.
 
-## Features in this scaffold
+## Working features
 - FastAPI app with modular routing
 - SQLite + SQLAlchemy setup for app metadata and persistence
 - Optional Neo4j integration for graph synchronization
@@ -206,7 +206,7 @@ The current extraction pipeline is an MVP hybrid implementation. It can:
 - `RelationInstance`
 
 ## Smoke test status
-The current scaffold was smoke-tested with FastAPI `TestClient` for:
+The current application was smoke-tested with FastAPI `TestClient` for:
 - project creation
 - ontology class/property creation
 - Turtle ontology import
@@ -218,9 +218,31 @@ The current scaffold was smoke-tested with FastAPI `TestClient` for:
 - RDF / OWL / JSON-LD / Turtle exports
 
 ## Notes
-- This is an MVP scaffold, not the final production architecture.
+- This is a working production-oriented baseline; deploy with managed secrets, migrations, and observability hardening for regulated environments.
 - The ontology generation logic is intentionally lightweight and heuristic-based for now.
 - The KG extraction logic mixes spaCy/optional ML with heuristics and should be upgraded further for production quality.
 - Uploaded files are stored under `backend/data/uploads/`.
 - SQLite DB is stored at `backend/data/app.db`.
-- Neo4j sync is implemented as a scaffold and currently uses a reified `RelationInstance` node model.
+- Neo4j sync is implemented and currently uses a reified `RelationInstance` node model.
+
+## Enterprise modules added
+- Auth/RBAC: `/api/v1/auth/register`, `/api/v1/auth/login`, `/api/v1/auth/api-keys`, `/api/v1/users/me`, seeded Admin/Ontology Engineer/Data Analyst/Viewer/API User roles.
+- Auditability: `audit_logs` model and admin audit-list endpoint.
+- Operations: extraction job resource under `/api/v1/projects/{project_id}/jobs/extraction` with inline execution for local mode and Celery/RQ-ready persistence.
+- Search/query: deterministic local search plus Neo4j Cypher execution support at `/api/v1/projects/{project_id}/search` and `/api/v1/projects/{project_id}/query`.
+- Visualization: normalized graph/tree/timeline payload at `/api/v1/projects/{project_id}/visualization`.
+- Versioning metadata: `ontology_versions` and `kg_metadata` tables for ontology/KG version tracking.
+
+## Deployment assets
+- Root `Dockerfile` runs the FastAPI API.
+- Root `docker-compose.yml` starts API, PostgreSQL, Redis, Neo4j, and OpenSearch.
+- `deploy/k8s/api-deployment.yaml` provides Kubernetes Deployment/Service manifests.
+- `.github/workflows/ci.yml` installs dependencies, compiles the app, runs tests, and runs Ruff.
+
+## Additional working ingestion and RBAC behavior
+- `POST /api/v1/projects/{project_id}/documents/bulk` uploads multiple files in one request.
+- `POST /api/v1/projects/{project_id}/documents/zip` expands a ZIP archive and ingests each file.
+- `POST /api/v1/projects/{project_id}/documents/url` fetches and ingests a remote document URL.
+- The extractor handles TXT/Markdown/HTML, CSV, JSON, XML, YAML, PDF, DOCX, XLSX, RTF, and RDF/OWL serializations.
+- Set `REQUIRE_AUTH=true` to enforce JWT/API-key authentication and RBAC dependencies. When enabled, project creation requires `projects:write`, project reads require membership/admin access, and project member management requires owner/admin project role.
+- `POST /api/v1/projects/{project_id}/query` executes SPARQL against the in-memory RDF graph generated from persisted project data; Cypher executes against Neo4j when configured.
